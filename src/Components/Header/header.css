@@ -1,0 +1,14 @@
+#main-header {
+    height: 50px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--bs-secondary-bg);
+    z-index: 1;
+    border-bottom: 1px solid var(--bs-secondary-color);
+}
+
+#main-header .logo {
+    width: 40px;
+    height: 40px;
+}

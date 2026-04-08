@@ -1,0 +1,26 @@
+body {
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  justify-content: center;
+  align-content: center;
+}
+
+button {
+  border: none;
+  background-color: transparent;
+}
+
+#root {
+  width: min(90%, 1000px);
+}
+
+.divider {
+  border-left: 1px solid var(--bs-secondary-color);
+}
+
+@media (max-width: 400px) {
+  .sacrifice {
+    display: none !important;
+  }
+}
