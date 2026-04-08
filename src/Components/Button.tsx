@@ -10,15 +10,17 @@ interface ButtonProps {
     outlineStyle?: false | true,
     HtmlType?: "button" | "submit" | "reset",
     className?: string,
+    id?: string,
 };
 
-const Button = ({ buttonType, children, onClickEvent, disabled, outlineStyle, HtmlType, className }: ButtonProps) => {
+const Button = ({ buttonType, children, onClickEvent, disabled, outlineStyle, HtmlType, className, id }: ButtonProps) => {
     return (
         <button
             type={HtmlType}
             className={"btn btn-" + (outlineStyle ? "outline-" : "") + buttonType + " " + className}
             onClick={onClickEvent}
             disabled={disabled}
+            id={id}
         >
             {children}
         </button>

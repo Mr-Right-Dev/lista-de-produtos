@@ -5,8 +5,11 @@ import Button from '../../Components/Button';
 import { Toast, Tooltip, Modal } from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
+import { useTranslation } from 'react-i18next';
+import { getListIdFromQuery, nameSize } from '../../modules/ListManager';
+import { db, type ItemList } from '../../modules/db';
 
-interface data {
+export interface data {
   amount: number,
   name: string,
   price: number,
@@ -19,9 +22,27 @@ const List = () => {
     price: 0,
   });
 
+  const { t } = useTranslation();
+
+  const searchId = getListIdFromQuery();
+
+  const dexieVersion: ItemList = {
+    id: -1,
+    title: searchId[0],
+    creatingDate: new Date().toISOString(),
+    lastEditedDate: new Date().toISOString(),
+  };
+
+  const [data, setData] = useState();
   const [clearedLast, setClearedLast] = useState<number>(1);
   const [itemList, setItemList] = useState<[data?]>([]);
   const [editTarget, setEditTarget] = useState<number>(-1);
+  
+
+  const usdFormatter = new Intl.NumberFormat(t("numberFormat"), {
+    style: 'currency',
+    currency: t("currency"),
+  });
 
   const tooltipRef = useRef<HTMLButtonElement>(null);
 
@@ -48,22 +69,40 @@ const List = () => {
     }
 
     const tost = document.getElementById('addedToast')
+
+    if (editTarget == -1) {
+      const newList: [data?] = [...itemList];
+      newList.push({ ...itemData });
+
+      tost.querySelector(".toast-body").innerHTML = t("toastRowInserted", { rows: 1 })
+      setItemList(newList);
+    } else {
+      const newList: [data?] = [...itemList];
+      newList[editTarget] = { ...itemData };
+      setEditTarget(-1);
+      tost.querySelector(".toast-body").innerHTML = t("toastRowEdited", { rows: 1 })
+      setItemList(newList);
+    }
+
     const toastBootstrap = Toast.getOrCreateInstance(tost)
     toastBootstrap.show()
 
-    const newList: [data?] = [...itemList];
-    newList.push({ ...itemData });
 
-    setItemList(newList);
+    document.getElementById("itemName")?.focus();
   };
 
   const handleRemove = (id: number) => {
     const newList: [data?] = [...itemList];
     newList.splice(id, 1);
 
+    if (editTarget == id) {
+      setEditTarget(-1);
+    }
+
     setItemList(newList);
 
     const tost = document.getElementById('removedToast')
+
     const toastBootstrap = Toast.getOrCreateInstance(tost)
     setClearedLast(1);
     toastBootstrap.show()
@@ -79,30 +118,44 @@ const List = () => {
     const toastBootstrap = Toast.getOrCreateInstance(tost)
     setClearedLast(itemList.length);
     toastBootstrap.show()
-
+    setEditTarget(-1);
     setItemList([]);
     Modal.getOrCreateInstance(document.getElementById('confirmModal')!).hide();
   };
 
   const handleEdit = (id: number) => {
+    if (editTarget != -1) {
+      const tost = document.getElementById('addedToast')
+
+      const newList: [data?] = [...itemList];
+      newList[editTarget] = { ...itemData };
+      setEditTarget(-1);
+      tost.querySelector(".toast-body").innerHTML = t("toastRowEdited", { rows: 1 })
+      setItemList(newList);
+
+      const toastBootstrap = Toast.getOrCreateInstance(tost)
+      toastBootstrap.show()
+    }
+
     setEditTarget(id);
+    setItemData(itemList[id]);
   }
 
   return (
     <>
-      <div className="modal fade" id="confirmModal" tabIndex="-1">
+      <div className="modal fade" id="confirmModal">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">Clear list</h1>
+              <h1 className="modal-title fs-5" id="exampleModalLabel">{t("modalClearTitle")}</h1>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              Are you sure you want to clear the list, this action cannot be undone.
+              {t("modalClearBody")}
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-success" data-bs-dismiss="modal">Abort</button>
-              <button type="button" className="btn btn-danger" onClick={handleClearAll}>Clear list</button>
+              <button type="button" className="btn btn-success" data-bs-dismiss="modal">{t("modalClearAbort")}</button>
+              <button type="button" className="btn btn-danger" onClick={handleClearAll}>{t("modalClearConfirm")}</button>
             </div>
           </div>
         </div>
@@ -113,28 +166,44 @@ const List = () => {
         <div id="addedToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
           <div className="toast-header">
             <svg aria-hidden="true" className="bd-placeholder-img rounded me-2" height="20" preserveAspectRatio="xMidYMid slice" width="20" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#00ff00"></rect></svg>
-            <strong className="me-auto">List</strong>
+            <strong className="me-auto">{t("toastTitle")}</strong>
             <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
           <div className="toast-body">
-            Inserted 1 row.
+            {t("toastRowInserted", { rows: 1 })}
           </div>
         </div>
         <div id="removedToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
           <div className="toast-header">
             <svg aria-hidden="true" className="bd-placeholder-img rounded me-2" height="20" preserveAspectRatio="xMidYMid slice" width="20" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#ff0000"></rect></svg>
-            <strong className="me-auto">List</strong>
+            <strong className="me-auto">{t("toastTitle")}</strong>
             <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
           <div className="toast-body">
-            Removed {clearedLast} row(s).
+            {t("toastRowRemoved", { rows: clearedLast })}
           </div>
         </div>
       </div>
 
       <div className="d-flex justify-content-start flex-column w-100 w-auto" id="main">
         <form
-          className={"d-inline-flex flex-wrap align-self-start p-2 justify-content-start flex-row w-100 h-auto needs-validation "+(editTarget != -1 && "edit-mode")}
+          className={"d-inline-flex flex-wrap align-self-start p-2 justify-content-start flex-row w-100 h-auto needs-validation"}
+          noValidate={true}
+          style={{ borderBottom: "1px solid var(--bs-tertiary-color)", background: "var(--bs-body-bg)" }}
+        >
+          <div className="col-md-4 w-auto h-auto flex-grow-1 m-1">
+            <label className="fs-4" htmlFor="itemName">{t("listNameLabel")}</label>
+            <input maxLength={nameSize*13} onFocus={(e) => e.target.select()} id="listName" name="name" className="form-control p-1 w-100" type="text" placeholder={t("listNameLabel")} aria-label={t("listNameLabel")} required={true} />
+            <div className="valid-feedback">
+              {t("formValid")}
+            </div>
+            <div className="invalid-feedback">
+              {t("formNameInvalid")}
+            </div>
+          </div>
+        </form>
+        <form
+          className={"d-inline-flex flex-wrap align-self-start p-2 justify-content-start flex-row w-100 h-auto needs-validation " + (editTarget != -1 && "edit-mode")}
           role="menuitem"
           onSubmit={handleInsertItem}
           noValidate={true}
@@ -142,37 +211,51 @@ const List = () => {
           style={{ borderBottom: "1px solid var(--bs-tertiary-color)", background: "var(--bs-body-bg)" }}
         >
           <div className="col-md-4 w-auto h-auto flex-grow-1 m-1">
-            <label htmlFor="itemName">Item Name:</label>
-            <input maxLength={30} id="itemName" name="name" value={itemData.name} onChange={handleInputChange} className="form-control p-1 w-100" type="text" placeholder="Item Name" aria-label="Item Name" required={true} />
+            <label htmlFor="itemName">{t("formNameLabel")}</label>
+            <input maxLength={50} onFocus={(e) => e.target.select()} id="itemName" name="name" value={itemData.name} onChange={handleInputChange} className="form-control p-1 w-100" type="text" placeholder={t("formNameLabel")} aria-label={t("formNameLabel")} required={true} />
             <div className="valid-feedback">
-              Looks good!
+              {t("formValid")}
             </div>
             <div className="invalid-feedback">
-              You must set the item name.
+              {t("formNameInvalid")}
             </div>
           </div>
 
           <div className="col-md-4 w-auto h-auto flex-shrink-1 m-1">
-            <label htmlFor="itemAmount">Amount:</label>
-            <input min={"1"} maxLength={10} id="itemAmount" name="amount" onChange={handleInputChange} className="form-control p-1 w-100" type="number" placeholder="Amount" aria-label="Amount" value={itemData.amount} required={true} />
+            <label htmlFor="itemAmount">{t("formAmountLabel")}</label>
+            <input min={"1"} maxLength={10} id="itemAmount" name="amount" onChange={handleInputChange} className="form-control p-1 w-100" type="number" placeholder={t("formAmountLabel")} aria-label={t("formAmountLabel")} value={itemData.amount} required={true} />
             <div className="valid-feedback">
-              Looks good!
+              {t("formValid")}
             </div>
             <div className="invalid-feedback">
-              It's needed a amount.
+              {t("formAmountInvalid")}
             </div>
           </div>
 
           <div className="col-md-4 w-auto h-auto flex-shrink-1 m-1">
-            <label htmlFor="itemPrice">Price:</label>
-            <input maxLength={10} step={"0.01"} id="itemPrice" name="price" onChange={handleInputChange} value={itemData.price} className="form-control p-1 w-100" type="number" placeholder="Price" aria-label="Price" required={false} />
+            <label htmlFor="itemPrice">{t("formPriceLabel")}</label>
+            <input maxLength={10} step={"0.01"} id="itemPrice" name="price" onChange={handleInputChange} value={itemData.price} className="form-control p-1 w-100" type="number" placeholder={t("formPriceLabel")} aria-label={t("formPriceLabel")} required={false} />
           </div>
 
           <Button className="w-auto flex-shrink-1 m-1 d-flex justify-content-center flex-row align-items-center h-auto" buttonType='primary' HtmlType="submit" outlineStyle={true}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus" viewBox="0 0 16 16">
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
-            </svg>
-            Insert
+            {
+              editTarget == -1 ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                  </svg>
+                  {t("formInsertLabel")}
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
+                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                  </svg>
+                  {t("formEditLabel")}
+                </>
+              )
+            }
           </Button>
         </form>
 
@@ -181,16 +264,16 @@ const List = () => {
             <thead>
               <tr>
                 <td>#</td>
-                <td>Name</td>
-                <td>Amount</td>
-                <td>Price</td>
+                <td>{t("formNameLabel")}</td>
+                <td>{t("formAmountLabel")}</td>
+                <td>{t("formPriceLabel")}</td>
                 <td style={{ width: "10%" }}>
                   <button
                     className="btn"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
                     data-bs-custom-class="custom-tooltip"
-                    data-bs-title="Clear all items."
+                    data-bs-title={t("clearItemsTooltip")}
                     ref={tooltipRef}
                     onClick={handleOpenModal}
                   >
@@ -205,18 +288,18 @@ const List = () => {
               {
                 itemList.map((row: any, i) =>
                 (
-                  <tr key={i}>
+                  <tr key={i} className={(editTarget == i && ("edit-mode"))}>
                     <td key={"id"}>{i + 1}</td>
                     <td key={"name"}>{row.name}</td>
                     <td key={"amount"}>x{Number(row.amount)}</td>
-                    <td key={"price"}>{row.price == 0 ? "-" : "$" + Number(row.price).toFixed(2)}</td>
+                    <td key={"price"}>{row.price == 0 ? "-" : usdFormatter.format(Number(row.price))}</td>
                     <td style={{ "padding": "3px" }}>
                       <Button
                         buttonType='primary'
                         outlineStyle={true}
                         className="m-1"
                         onClickEvent={() => {
-                         handleEdit(i);
+                          handleEdit(i);
                         }}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -235,7 +318,7 @@ const List = () => {
                           <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
                         </svg>
                       </Button>
-                      
+
                     </td>
                   </tr>
                 ))

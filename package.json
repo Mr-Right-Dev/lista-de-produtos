@@ -13,8 +13,11 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
     "dexie": "^4.4.2",
+    "i18next": "^26.0.4",
+    "random-words": "^1.3.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-i18next": "^17.0.2",
     "react-router-dom": "^7.14.0"
   },
   "devDependencies": {

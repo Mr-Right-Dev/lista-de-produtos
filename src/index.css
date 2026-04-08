@@ -30,7 +30,7 @@ button {
   border-left: 1px solid var(--bs-secondary-color);
 }
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   .sacrifice {
     display: none !important;
   }
