@@ -1,0 +1,12 @@
+#main form {
+    height: auto;
+    width: 100%;
+}
+
+#main-table {
+    padding-bottom: 30px;
+}
+
+.edit-mode {
+    border: solid 2px var(--bs-primary) !important;
+}

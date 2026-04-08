@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useState } from 'react';
-import './app.css';
-import Button from './Components/Button';
+import './list.css';
+import Button from '../../Components/Button';
 import { Toast, Tooltip, Modal } from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
@@ -12,14 +12,16 @@ interface data {
   price: number,
 };
 
-const App = () => {
+const List = () => {
   const [itemData, setItemData] = useState<data>({
     amount: 1,
     name: "",
     price: 0,
   });
 
+  const [clearedLast, setClearedLast] = useState<number>(1);
   const [itemList, setItemList] = useState<[data?]>([]);
+  const [editTarget, setEditTarget] = useState<number>(-1);
 
   const tooltipRef = useRef<HTMLButtonElement>(null);
 
@@ -63,6 +65,7 @@ const App = () => {
 
     const tost = document.getElementById('removedToast')
     const toastBootstrap = Toast.getOrCreateInstance(tost)
+    setClearedLast(1);
     toastBootstrap.show()
   }
 
@@ -72,9 +75,18 @@ const App = () => {
   };
 
   const handleClearAll = () => {
+    const tost = document.getElementById('removedToast')
+    const toastBootstrap = Toast.getOrCreateInstance(tost)
+    setClearedLast(itemList.length);
+    toastBootstrap.show()
+
     setItemList([]);
     Modal.getOrCreateInstance(document.getElementById('confirmModal')!).hide();
   };
+
+  const handleEdit = (id: number) => {
+    setEditTarget(id);
+  }
 
   return (
     <>
@@ -96,9 +108,33 @@ const App = () => {
         </div>
       </div>
 
+
+      <div className="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="addedToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div className="toast-header">
+            <svg aria-hidden="true" className="bd-placeholder-img rounded me-2" height="20" preserveAspectRatio="xMidYMid slice" width="20" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#00ff00"></rect></svg>
+            <strong className="me-auto">List</strong>
+            <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div className="toast-body">
+            Inserted 1 row.
+          </div>
+        </div>
+        <div id="removedToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div className="toast-header">
+            <svg aria-hidden="true" className="bd-placeholder-img rounded me-2" height="20" preserveAspectRatio="xMidYMid slice" width="20" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#ff0000"></rect></svg>
+            <strong className="me-auto">List</strong>
+            <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div className="toast-body">
+            Removed {clearedLast} row(s).
+          </div>
+        </div>
+      </div>
+
       <div className="d-flex justify-content-start flex-column w-100 w-auto" id="main">
         <form
-          className={"d-inline-flex flex-wrap align-self-start p-2 justify-content-start flex-row w-100 h-auto needs-validation"}
+          className={"d-inline-flex flex-wrap align-self-start p-2 justify-content-start flex-row w-100 h-auto needs-validation "+(editTarget != -1 && "edit-mode")}
           role="menuitem"
           onSubmit={handleInsertItem}
           noValidate={true}
@@ -148,7 +184,7 @@ const App = () => {
                 <td>Name</td>
                 <td>Amount</td>
                 <td>Price</td>
-                <td style={{ width: "6%" }}>
+                <td style={{ width: "10%" }}>
                   <button
                     className="btn"
                     data-bs-toggle="tooltip"
@@ -176,6 +212,19 @@ const App = () => {
                     <td key={"price"}>{row.price == 0 ? "-" : "$" + Number(row.price).toFixed(2)}</td>
                     <td style={{ "padding": "3px" }}>
                       <Button
+                        buttonType='primary'
+                        outlineStyle={true}
+                        className="m-1"
+                        onClickEvent={() => {
+                         handleEdit(i);
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                        </svg>
+                      </Button>
+                      <Button
                         buttonType='danger'
                         outlineStyle={true}
                         onClickEvent={() => {
@@ -186,6 +235,7 @@ const App = () => {
                           <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
                         </svg>
                       </Button>
+                      
                     </td>
                   </tr>
                 ))
@@ -198,4 +248,4 @@ const App = () => {
   );
 }
 
-export default App;
+export default List;
