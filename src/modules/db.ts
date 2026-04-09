@@ -2,12 +2,11 @@ import Dexie, { type EntityTable } from 'dexie';
 import { type data } from '../Pages/List/List';
 
 interface ItemList {
-    id: number,
+    id?: number,
     title: string,
-    list: [data],
+    list: [data?],
     creatingDate: string,
     lastEditedDate: string,
-    
 }
 
 const db = new Dexie('MyDatabase') as Dexie & {

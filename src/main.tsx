@@ -1,25 +1,30 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import './i18n.ts'
 import 'bootstrap/dist/css/bootstrap.css'
 import Header from './Components/Header/Header.tsx'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import List from './Pages/List/List.tsx'
 import Home from './Pages/Home/Home.tsx'
 import NotFound from './Pages/NotFound/NotFound.tsx'
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'list', element: <List /> },
+      { path: '*', element: <NotFound />}
+    ],
+  },
+])
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Header />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/list" element={<List />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </StrictMode>,
 )

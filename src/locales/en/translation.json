@@ -1,4 +1,5 @@
 {
+    "appName": "Product List",
     "numberFormat": "en-US",
     "currency": "USD",
     "toastTitle": "List",
@@ -8,11 +9,16 @@
     "toastRowInserted": "Inserted {{rows}} row(s).",
     "toastRowRemoved": "Removed {{rows}} row(s).",
     "toastRowEdited": "Edited {{rows}} row(s).",
+    "toastSaveLabel": "Dexie",
+    "toastSaveSuccess": "Saved all changes.",
+    "toastSaveFailed": "Something went wrong while saving.",
+    "toastLoadFail": "Something went wrong while loading.",
     "modalClearBody": "Are you sure you want to clear the list, this action cannot be undone.",
     "modalClearTitle": "Clear list",
     "modalClearAbort": "Abort",
     "modalClearConfirm": "Clear list!",
     "listNameLabel": "List Name",
+    "unsavedBadge": "UNSAVED CHANGES",
     "formNameLabel": "Item Name",
     "formAmountLabel": "Amount",
     "formPriceLabel": "Price",
@@ -24,5 +30,9 @@
     "clearItemsTooltip": "Clear all items.",
     "notFoundTitle": "Page not found",
     "notFoundLore": "Oops! The page you’re looking for doesn’t exist or has been moved. <br/> Check the URL or go back to the homepage.",
-    "notFoundButton": "Return to main page"
+    "notFoundButton": "Return to main page",
+    "unsavedStay": "Stay",
+    "unsavedDiscard": "Discart",
+    "unsavedBody": "You have unsaved changes. If you leave now, your progress will be lost. <br /> Please save before continuing.",
+    "unsavedTitle": "Discard current changes?"
 }

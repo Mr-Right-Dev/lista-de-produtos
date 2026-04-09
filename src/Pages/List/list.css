@@ -5,8 +5,15 @@
 
 #main-table {
     padding-bottom: 30px;
+    overflow-y: auto;
 }
 
 .edit-mode {
     border: solid 2px var(--bs-primary) !important;
+}
+
+td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

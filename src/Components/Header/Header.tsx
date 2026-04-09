@@ -3,7 +3,6 @@ import logo from './../../Assets/logo.png';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
-
 const Header = () => {
     const languages = [
         { code: 'en', label: 'English' },
@@ -17,17 +16,19 @@ const Header = () => {
 
     document.querySelector("body")?.setAttribute("data-bs-theme", theme);
 
-    const handleThemeChange = (e) => {
+    const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTheme(e.target.name)
 
         document.querySelector("body")?.setAttribute("data-bs-theme", theme);
-        localStorage.setItem("theme", e.target.name );
+        localStorage.setItem("theme", e.target.name);
     };
 
+    document.title = t("appName");
 
     return (
         <div id="main-header" className="d-flex w-100 justify-content-start align-items-center">
-            <div className="d-inline-flex align-items-center">
+            <div className="d-inline-flex align-items-center" onClick={() => {
+            }}>
                 <img className="logo m-1" src={logo} />
                 <p id="location" className="m-1 text-truncate sacrifice">Mr-Right-Dev @ Github</p>
             </div>
@@ -52,7 +53,7 @@ const Header = () => {
             <select className="form-select" value={i18n.language} onChange={(e) => {
                 i18n.changeLanguage(e.target.value);
                 localStorage.setItem('lang', e.target.value);
-            }} style={{"width": "max(10%, 150px)", "position": "absolute", "right": "5px", "top": "50%", "transform": "translate(0, -50%)"}} aria-label="Select language">
+            }} style={{ "width": "max(10%, 150px)", "position": "absolute", "right": "5px", "top": "50%", "transform": "translate(0, -50%)" }} aria-label="Select language">
                 {
                     languages.map((row) => (
                         <option value={row.code}>{row.label + " (" + row.code.toUpperCase() + ")"}</option>

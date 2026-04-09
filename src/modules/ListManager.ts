@@ -13,7 +13,7 @@ export function generateName(): string {
 
 export function getListIdFromQuery(): [string, boolean] {
     const urlQuerry = new URLSearchParams(window.location.search);
-    if (urlQuerry.has("listId") && urlQuerry.get("listId").trim() != "") {
+    if (urlQuerry && urlQuerry.has("listId") && urlQuerry.get("listId")?.trim() != "") {
         return [urlQuerry.get("listId"), false];
     }
 

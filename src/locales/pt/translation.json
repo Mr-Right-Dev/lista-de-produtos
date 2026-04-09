@@ -1,4 +1,5 @@
 {
+    "appName": "Lista de Produtos",
     "numberFormat": "pt-BR",
     "currency": "BRL",
     "toastTitle": "Lista",
@@ -8,6 +9,10 @@
     "toastRowInserted": "Insirido {{rows}} linha(s).",
     "toastRowRemoved": "Removido {{rows}} linha(s).",
     "toastRowEdited": "Editado {{rows}} linha(s).",
+    "toastSaveLabel": "Dexie",
+    "toastSaveSuccess": "Todas alterações salvas.",
+    "toastSaveFailed": "Alguma coisa deu errado no salvando.",
+    "toastLoadFail": "Alguma coisa deu errado no carregamento.",
     "modalClearBody": "Tem certeza de que deseja limpar a lista? Esta ação não pode ser desfeita.",
     "modalClearTitle": "Limpar lista?",
     "modalClearAbort": "Cancelar",
@@ -24,5 +29,9 @@
     "clearItemsTooltip": "Limpa todos os items.",
     "notFoundTitle": "Pagina não encontrada!",
     "notFoundLore": "Ops! A página que você procura não existe ou foi movida. <br/> Verifique o URL ou volte para a página inicial.",
-    "notFoundButton": "Voltar á paginal inicial"
+    "notFoundButton": "Voltar á paginal inicial",
+    "unsavedStay": "Ficar",
+    "unsavedDiscard": "Descartar",
+    "unsavedBody": "Você tem alterações não salvas. Se você sair agora, seu progresso será perdido. <br /> Salve antes de continuar.",
+    "unsavedTitle": "Descartar alterações?"
 }
