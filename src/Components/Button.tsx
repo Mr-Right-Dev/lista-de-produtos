@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 
 type ButtonTypes = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "link";
 

@@ -38,5 +38,9 @@
     "unsavedStay": "Stay",
     "unsavedDiscard": "Discart",
     "unsavedBody": "You have unsaved changes. If you leave now, your progress will be lost. <br /> Please save before continuing.",
-    "unsavedTitle": "Discard current changes?"
+    "unsavedTitle": "Discard current changes?",
+    "newListButton": "New List",
+    "totalItems": "Total Items",
+    "options": "Options",
+    "noListsFound": "No lists found."
 }

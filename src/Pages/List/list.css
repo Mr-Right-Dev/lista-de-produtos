@@ -17,3 +17,9 @@ td {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+#back {
+    position: fixed;
+    top: 60px;
+    left: 5px;
+}

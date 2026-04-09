@@ -11,6 +11,7 @@ import UnsavedChangesModal from '../../Components/UnsavedChangesModal';
 import { useUnsavedChanges } from './../../modules/useUnsavedChanges';
 import Loader from '../../Components/Loader';
 import { openModal } from '../../modules/Utils';
+import { useNavigate } from 'react-router-dom'
 
 export interface data {
   amount: number,
@@ -20,6 +21,7 @@ export interface data {
 
 const List = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const searchId = getListIdFromQuery();
   const [listName, setListName] = useState(searchId[0]);
@@ -35,7 +37,7 @@ const List = () => {
     price: 0,
   });
 
-  var dexieVersion: ItemList = {
+  let dexieVersion: ItemList = {
     id: undefined,
     title: searchId[0],
     list: itemList,
@@ -60,13 +62,13 @@ const List = () => {
 
   useEffect(() => {
     (async () => {
-      var first;
+      let first;
       try {
         first = await db.itemList.where('title').equals(searchId[0]).toArray();
       } catch (e) {
         const tost = document.getElementById("savedToast");
-        tost.querySelector(".toast-body").innerHTML = t("toastLoadFail");
-        const toastBootstrap = Toast.getOrCreateInstance(tost)
+        tost!.querySelector(".toast-body")!.innerHTML = t("toastLoadFail");
+        const toastBootstrap = Toast.getOrCreateInstance(tost!)
         toastBootstrap.show()
         console.error('Something went wrong:', e);
         return;
@@ -85,7 +87,7 @@ const List = () => {
     })()
   }, []);
 
-  const handleListNameSubmit = async (e) => {
+  const handleListNameSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -101,13 +103,6 @@ const List = () => {
     dexieVersion.lastEditedDate = new Date().toISOString();
     dexieVersion.list = [...itemList];
     const query = new URLSearchParams(window.location.search);
-
-    const successToast = () => {
-      const tost = document.getElementById("savedToast");
-      tost.querySelector(".toast-body").innerHTML = t("toastSaveSuccess");
-      const toastBootstrap = Toast.getOrCreateInstance(tost)
-      toastBootstrap.show()
-    }
 
     try {
       const first = await db.itemList.where('title').equals(listName).toArray();
@@ -135,12 +130,12 @@ const List = () => {
       window.history.replaceState(null, '', `?${query.toString()}`);
 
       const tost = document.getElementById("savedToast");
-      tost.querySelector(".toast-body").innerHTML = t("toastSaveSuccess");
-      Toast.getOrCreateInstance(tost).show();
+      tost!.querySelector(".toast-body")!.innerHTML = t("toastSaveSuccess");
+      Toast.getOrCreateInstance(tost!).show();
     } catch (e) {
       const tost = document.getElementById("savedToast");
-      tost.querySelector(".toast-body").innerHTML = t("toastSaveFailed");
-      Toast.getOrCreateInstance(tost).show();
+      tost!.querySelector(".toast-body")!.innerHTML = t("toastSaveFailed");
+      Toast.getOrCreateInstance(tost!).show();
       console.error('Something went wrong:', e);
       setLoadingState(false);
     }
@@ -169,18 +164,20 @@ const List = () => {
       const newList: [data?] = [...itemList];
       newList.push({ ...itemData });
 
-      tost.querySelector(".toast-body").innerHTML = t("toastRowInserted", { rows: 1 })
+      tost!.querySelector(".toast-body")!.innerHTML = t("toastRowInserted", { rows: 1 })
       setItemList(newList);
     } else {
       const newList: [data?] = [...itemList];
       newList[editTarget] = { ...itemData };
       setEditTarget(-1);
-      tost.querySelector(".toast-body").innerHTML = t("toastRowEdited", { rows: 1 })
+      tost!.querySelector(".toast-body")!.innerHTML = t("toastRowEdited", { rows: 1 })
       setItemList(newList);
     }
 
-    const toastBootstrap = Toast.getOrCreateInstance(tost)
-    toastBootstrap.show()
+    if (tost) {
+      const toastBootstrap = Toast.getOrCreateInstance(tost)
+      toastBootstrap.show()
+    }
 
 
     document.getElementById("itemName")?.focus();
@@ -198,9 +195,13 @@ const List = () => {
 
     const tost = document.getElementById('removedToast')
 
-    const toastBootstrap = Toast.getOrCreateInstance(tost)
+    if (tost) {
+      const toastBootstrap = Toast.getOrCreateInstance(tost)
+      toastBootstrap.show()
+    }
+
     setClearedLast(1);
-    toastBootstrap.show()
+
   }
 
   const handleOpenModal = () => {
@@ -210,9 +211,12 @@ const List = () => {
 
   const handleClearAll = () => {
     const tost = document.getElementById('removedToast')
-    const toastBootstrap = Toast.getOrCreateInstance(tost)
+
     setClearedLast(itemList.length);
-    toastBootstrap.show()
+    if (tost) {
+      const toastBootstrap = Toast.getOrCreateInstance(tost)
+      toastBootstrap.show()
+    }
     setEditTarget(-1);
     setItemList([]);
     Modal.getOrCreateInstance(document.getElementById('confirmModal')!).hide();
@@ -225,20 +229,35 @@ const List = () => {
       const newList: [data?] = [...itemList];
       newList[editTarget] = { ...itemData };
       setEditTarget(-1);
-      tost.querySelector(".toast-body").innerHTML = t("toastRowEdited", { rows: 1 })
+      if (tost) {
+        const toastBody = tost.querySelector(".toast-body");
+        if (toastBody) {
+          toastBody.innerHTML = t("toastRowEdited", { rows: 1 });
+        }
+      }
       setItemList(newList);
 
-      const toastBootstrap = Toast.getOrCreateInstance(tost)
-      toastBootstrap.show()
+      if (tost) {
+        const toastBootstrap = Toast.getOrCreateInstance(tost);
+        toastBootstrap.show()
+      }
     }
 
     setEditTarget(id);
-    setItemData(itemList[id]);
+    if (itemList[id]) {
+      setItemData(itemList[id]);
+    }
   }
 
   return (
     <>
       <Loader visible={loadingState} />
+
+      <Button id="back" buttonType="secondary" outlineStyle={true} onClickEvent={() => navigate(-1)}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-return-left" viewBox="0 0 16 16">
+          <path fillRule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5" />
+        </svg>
+      </Button>
 
       {blocker.state === 'blocked' && (
         <UnsavedChangesModal
@@ -274,9 +293,9 @@ const List = () => {
             </div>
             <div className="modal-body">
               <Trans
-                  i18nKey="modalOverwriteBody"
-                  components={{ br: <br /> }}
-                />
+                i18nKey="modalOverwriteBody"
+                components={{ br: <br /> }}
+              />
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-success" data-bs-dismiss="modal">{t("modalOverwriteAbort")}</button>
@@ -402,7 +421,7 @@ const List = () => {
                 <>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                    <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
                   </svg>
                   {t("formEditLabel")}
                 </>
@@ -456,7 +475,7 @@ const List = () => {
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                           <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                          <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
                         </svg>
                       </Button>
                       <Button

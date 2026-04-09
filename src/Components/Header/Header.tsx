@@ -1,7 +1,7 @@
 import './header.css';
 import logo from './../../Assets/logo.png';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Header = () => {
     const languages = [
@@ -14,7 +14,10 @@ const Header = () => {
 
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
-    document.querySelector("body")?.setAttribute("data-bs-theme", theme);
+    useEffect(() => {
+        document.querySelector("body")?.setAttribute("data-bs-theme", theme);
+        document.title = t("appName");
+    });
 
     const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTheme(e.target.name)
@@ -23,7 +26,7 @@ const Header = () => {
         localStorage.setItem("theme", e.target.name);
     };
 
-    document.title = t("appName");
+    
 
     return (
         <div id="main-header" className="d-flex w-100 justify-content-start align-items-center">
@@ -42,7 +45,7 @@ const Header = () => {
                 </p>
 
                 <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" className="btn-check" checked={theme == "dark"} name="dark" radioGroup="btnradio" id="btnradio1" defaultChecked={true} onChange={handleThemeChange} />
+                    <input type="radio" className="btn-check" checked={theme == "dark"} name="dark" radioGroup="btnradio" id="btnradio1" onChange={handleThemeChange} />
                     <label className="btn btn-outline-primary" htmlFor="btnradio1">{t("themeDarkLabel")}</label>
 
                     <input type="radio" className="btn-check" checked={theme == "light"} name="light" radioGroup="btnradio" id="btnradio2" onChange={handleThemeChange} />
@@ -56,7 +59,7 @@ const Header = () => {
             }} style={{ "width": "max(10%, 150px)", "position": "absolute", "right": "5px", "top": "50%", "transform": "translate(0, -50%)" }} aria-label="Select language">
                 {
                     languages.map((row) => (
-                        <option value={row.code}>{row.label + " (" + row.code.toUpperCase() + ")"}</option>
+                        <option key={row.code} value={row.code}>{row.label + " (" + row.code.toUpperCase() + ")"}</option>
                     ))
                 }
             </select>

@@ -22,6 +22,7 @@
     "modalOverwriteAbort": "Abortar",
     "modalOverwriteAccept": "Substituir dados",
     "listNameLabel": "Nome da Lista",
+    "unsavedBadge": "ALTERÇÕES NÃO SALVAS",
     "formNameLabel": "Nome",
     "formAmountLabel": "Quantidade",
     "formPriceLabel": "Preço",
@@ -37,5 +38,9 @@
     "unsavedStay": "Ficar",
     "unsavedDiscard": "Descartar",
     "unsavedBody": "Você tem alterações não salvas. Se você sair agora, seu progresso será perdido. <br /> Salve antes de continuar.",
-    "unsavedTitle": "Descartar alterações?"
+    "unsavedTitle": "Descartar alterações?",
+    "newListButton": "Nova lista",
+    "totalItems": "Total de items",
+    "options": "Opções",
+    "noListsFound": "Nehuma lista encontrada."
 }

@@ -13,13 +13,17 @@ export function generateName(): string {
 
 export function getListIdFromQuery(): [string, boolean] {
     const urlQuerry = new URLSearchParams(window.location.search);
-    if (urlQuerry && urlQuerry.has("listId") && urlQuerry.get("listId")?.trim() != "") {
-        return [urlQuerry.get("listId"), false];
+    if (urlQuerry != null && urlQuerry.has("listId") && urlQuerry.get("listId") != null && urlQuerry.get("listId")?.trim() != "") {
+        const id = urlQuerry.get("listId");
+        if (id != null) {
+            return [id, false];
+        }
+        
     }
 
     const newName = generateName();
     urlQuerry.set("listId", newName);
-    window.location.search = `?${urlQuerry.toString()}`
+    window.history.replaceState(null, '', `?${urlQuerry.toString()}`);
 
     return [newName, true];
 }
