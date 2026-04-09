@@ -4,12 +4,13 @@ import Button from '../../Components/Button';
 import { Toast, Tooltip, Modal } from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { getListIdFromQuery, nameSize } from '../../modules/ListManager';
 import { db, type ItemList } from '../../modules/db';
 import UnsavedChangesModal from '../../Components/UnsavedChangesModal';
 import { useUnsavedChanges } from './../../modules/useUnsavedChanges';
 import Loader from '../../Components/Loader';
+import { openModal } from '../../modules/Utils';
 
 export interface data {
   amount: number,
@@ -56,8 +57,6 @@ const List = () => {
     const tooltip = new Tooltip(tooltipRef.current);
     return () => tooltip.dispose();
   }, [itemList.length]);
-
-
 
   useEffect(() => {
     (async () => {
@@ -111,8 +110,18 @@ const List = () => {
     }
 
     try {
+      const first = await db.itemList.where('title').equals(listName).toArray();
+      if (first[0] && first[0].id != listId) {
+        if (!(await openModal("overwriteModal"))) {
+          setLoadingState(false);
+          return;
+        }
+
+        await db.itemList.delete(first[0].id);
+      }
+
       const newId = await db.itemList.put({
-        id: listId,                             // ← from state, not dexieVersion
+        id: listId,
         title: listName,
         list: [...itemList],
         creatingDate: dexieVersion.creatingDate || new Date().toISOString(),
@@ -256,6 +265,26 @@ const List = () => {
         </div>
       </div>
 
+      <div className="modal fade" id="overwriteModal">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">{t("modalOverwriteTitle")}</h1>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <Trans
+                  i18nKey="modalOverwriteBody"
+                  components={{ br: <br /> }}
+                />
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-success" data-bs-dismiss="modal">{t("modalOverwriteAbort")}</button>
+              <button type="button" className="btn btn-danger">{t("modalOverwriteAccept")}</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="addedToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -300,7 +329,7 @@ const List = () => {
           onSubmit={handleListNameSubmit}
         >
           <div className="col-md-4 w-auto h-auto flex-grow-1 m-1">
-            <label className="fs-4" htmlFor="itemName">{t("listNameLabel")} {unSavedChanges && (<span style={{"fontSize": "0.6rem"}} className="badge text-bg-danger">{t("unsavedBadge")}</span>)}</label>
+            <label className="fs-4" htmlFor="itemName">{t("listNameLabel")} {unSavedChanges && (<span style={{ "fontSize": "0.6rem" }} className="badge text-bg-danger">{t("unsavedBadge")}</span>)}</label>
             <input value={listName} onChange={(e) => {
               setListName(e.target.value);
               setUnsavedChanges(true);
@@ -382,14 +411,14 @@ const List = () => {
           </Button>
         </form>
 
-        <div style={{"overflow": "auto"}}>{itemList.length > 0 &&
+        <div style={{ "overflow": "auto" }}>{itemList.length > 0 &&
           (<table id="main-table" className="table table-striped">
             <thead>
               <tr>
                 <td>#</td>
-                <td style={{"maxWidth": "100px"}}>{t("formNameLabel")}</td>
-                <td style={{"maxWidth": "100px"}}>{t("formAmountLabel")}</td>
-                <td style={{"maxWidth": "100px"}}>{t("formPriceLabel")}</td>
+                <td style={{ "maxWidth": "100px" }}>{t("formNameLabel")}</td>
+                <td style={{ "maxWidth": "100px" }}>{t("formAmountLabel")}</td>
+                <td style={{ "maxWidth": "100px" }}>{t("formPriceLabel")}</td>
                 <td style={{ width: "10%" }}>
                   <button
                     className="btn"
@@ -413,9 +442,9 @@ const List = () => {
                 (
                   <tr key={i} className={(editTarget == i ? ("edit-mode") : "")}>
                     <td key={"id"}>{i + 1}</td>
-                    <td style={{"maxWidth": "100px"}} key={"name"}>{row.name}</td>
-                    <td style={{"maxWidth": "100px"}} key={"amount"}>x{Number(row.amount)}</td>
-                    <td style={{"maxWidth": "100px"}} key={"price"}>{row.price == 0 ? "-" : usdFormatter.format(Number(row.price))}</td>
+                    <td style={{ "maxWidth": "100px" }} key={"name"}>{row.name}</td>
+                    <td style={{ "maxWidth": "100px" }} key={"amount"}>x{Number(row.amount)}</td>
+                    <td style={{ "maxWidth": "100px" }} key={"price"}>{row.price == 0 ? "-" : usdFormatter.format(Number(row.price))}</td>
                     <td style={{ "padding": "3px" }}>
                       <Button
                         buttonType='primary'
