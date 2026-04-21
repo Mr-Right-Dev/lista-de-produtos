@@ -249,6 +249,26 @@ const List = () => {
     }
   }
 
+  const totalRow = () => {
+    let amountTotal = 0;
+    let priceTotal = 0;
+
+    itemList.forEach((elmtn => {
+      amountTotal += Number(elmtn?.amount ?? 1);
+      priceTotal += Number(elmtn?.price ?? 0);
+    }))
+
+    return (
+      <tr key={itemList.length+1}>
+        <td key={"id"}>#</td>
+        <td style={{ "maxWidth": "100px" }} key={"name"}>{t("total")}</td>
+        <td style={{ "maxWidth": "100px" }} key={"amount"}>x{Number(amountTotal)}</td>
+        <td style={{ "maxWidth": "100px" }} key={"price"}>{priceTotal == 0 ? "-" : usdFormatter.format(Number(priceTotal))}</td>
+        <td style={{ "maxWidth": "100px" }}>-</td>
+      </tr>
+    );
+  }
+
   return (
     <>
       <Loader visible={loadingState} />
@@ -493,6 +513,9 @@ const List = () => {
                     </td>
                   </tr>
                 ))
+              }
+              {
+                itemList.length != 0 && totalRow()
               }
             </tbody>
           </table>

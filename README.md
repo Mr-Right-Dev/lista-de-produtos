@@ -40,4 +40,6 @@ npx cap open android
 * i18next (for multi-lang)
 
 # Features I intent to add:
-- [ ] See the total.
+- [x] See the total.
+- [ ] Easier pasting.
+- [ ] Scrolling text when wrapped.
