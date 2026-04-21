@@ -254,8 +254,11 @@ const List = () => {
     let priceTotal = 0;
 
     itemList.forEach((elmtn => {
-      amountTotal += Number(elmtn?.amount ?? 1);
-      priceTotal += Number(elmtn?.price ?? 0);
+      const amount = Number(elmtn?.amount ?? 1);
+      const price = Number(elmtn?.price ?? 0);
+
+      amountTotal += amount;
+      priceTotal += price*amount;
     }))
 
     return (
