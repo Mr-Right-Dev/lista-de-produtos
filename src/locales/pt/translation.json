@@ -42,5 +42,6 @@
     "newListButton": "Nova lista",
     "totalItems": "Total de items",
     "options": "Opções",
-    "noListsFound": "Nehuma lista encontrada."
+    "noListsFound": "Nehuma lista encontrada.",
+    "total": "Total"
 }
