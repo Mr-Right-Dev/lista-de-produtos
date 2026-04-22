@@ -1,0 +1,16 @@
+{
+  "name": "Product List",
+  "short_name": "PL",
+  "description": "Make a simple list.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "460x460",
+      "type": "image/png"
+    }
+  ]
+}
