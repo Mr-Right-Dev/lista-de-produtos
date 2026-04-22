@@ -478,7 +478,7 @@ const List = () => {
                 </td>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="table-group-divider">
               {
                 itemList.map((row: any, i) =>
                 (
@@ -517,10 +517,13 @@ const List = () => {
                   </tr>
                 ))
               }
+              
+            </tbody>
+            <tfoot className="table-group-divider">
               {
                 itemList.length != 0 && totalRow()
               }
-            </tbody>
+            </tfoot>
           </table>
           )}</div>
       </div>
